@@ -1,3 +1,6 @@
+// See Notes also
+// Screenshots No from (7843 - 8046)
+
 import java.util.*;
 public class Sep12 {
     
@@ -243,7 +246,7 @@ public class Sep12 {
     // 7. Segmented Sieve ( PRIME1 - Prime Generator - SPOJ )
     // https://www.spoj.com/problems/PRIME1/cstart=10
     
-    // Not submitted (Gives wrong answer)
+    // Not correct (Gives wrong answer) (See next approach)
     public static void sieveInRange(int m, int n) {
 		
 		List<Integer> primes = getPrimeNoUptoRootM(n);
@@ -257,10 +260,13 @@ public class Sep12 {
 			
 			int prime = primes.get(i);
 			int idx =  (int)(Math.ceil(((float)m / (float)prime)));
-
+ 
             idx *= prime;
-			idx = idx - m;
-			
+			idx = idx - m; // 0 based index for traversing in array
+ 
+            // making idx +ve if idx is -ve
+            while(idx < 0) idx+= prime;
+ 
             for(int j = idx; j < absSize; j += prime ) {
                 arr[j] = false;
             }
@@ -281,10 +287,8 @@ public class Sep12 {
 	}
 	
 	public static List<Integer> getPrimeNoUptoRootM( int m) {
-		
-		int size = 1;
-		
-		while(size*size < m) size++;
+		// 2 to root(m) prime numbers
+		int size = (int)Math.sqrt(m);
 		
 		boolean arr[] = new boolean[size + 1];
 		Arrays.fill(arr,true);
@@ -309,6 +313,64 @@ public class Sep12 {
 		}
 		return ans;
 	}
+    
+    // Submitted Approach (Not Mine)
+
+    public static void primeGenerator () {
+        Scanner scn = new Scanner(System.in);
+        int[] primes = new int[4000];
+        int numprimes = 0;
+
+        primes[numprimes++] = 2;
+        for (int i = 3; i <= 32000; i+=2) {
+            boolean isprime = true;
+            double cap = Math.sqrt(i) + 1.0;
+
+                for (int j = 0; j < numprimes; j++) {
+                if (j >= cap) break;
+                if (i % primes[j] == 0) {
+                    isprime = false;
+                    break;
+                }
+            }
+            if (isprime) primes[numprimes++] = i;
+        }
+
+
+        int T,N,M;
+
+        T = scn.nextInt();
+
+        for (int t = 0; t < T; t++) {
+            if (t > 0) System.out.println("");
+
+            M = scn.nextInt();
+            N = scn.nextInt();
+
+            if (M < 2) M = 2;
+
+            boolean[] isprime = new boolean[100001];
+            for (int j = 0; j < 100001; j++) {
+                isprime[j] = true;
+            }
+
+            for (int i = 0; i < numprimes; i++) {
+                int p = primes[i];
+                int start;
+
+                if (p >= M) start = p*2;
+                else start = M + ((p - M % p)%p);
+
+                    for (int j = start; j <= N; j += p) {
+                    isprime[j - M] = false;
+                }
+            }
+
+            for (int i = M; i <= N; i++) {
+                if (isprime[i-M]) System.out.println(i);
+            }
+        }
+    }
 
     // 8. Two Sum ( whether a pair in array is equal to given value or not )
     // https://practice.geeksforgeeks.org/problems/key-pair/0
