@@ -1,10 +1,10 @@
 import java.util.*;
 
-public static class Sep16 {
+public class Sep16 {
 
     // 1. Leetcode 632. Smallest Range Covering Elements from K Lists
     // https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/
-    
+
     // You have k lists of sorted integers in non-decreasing order. Find the
     // smallest range that includes at least one number from each of the k lists.
     // We define the range [a, b] is smaller than range [c, d] if b - a < d - c or a
@@ -117,25 +117,47 @@ public static class Sep16 {
         return String.valueOf(arr);
     }
 
+    // 3. Fast Exponentiation ( 0(logn) method for calculating power iteratively)
+
+    public static int fastExponentiation(int x, int p) {
+        int ans = 1;
+        // decrease the power to half and increase the number to double
+        // it will reduce the multiplication of number p times
+        while (p > 1) {
+            if (p % 2 == 0) {
+                ans *= x;// store extra x in answer variable
+                p--;
+            }
+            x = x * 2;
+            p = p / 2;
+        }
+
+        return x * ans;
+    }
+
+    // 4. Leetcode 509. Fibonacci Number
+    // o(logn) approach using above code method
+
+    
+
     // 5. Leetcode 838. Push Dominoes
     // https://leetcode.com/problems/push-dominoes/
 
-
     public String pushDominoes(String S) {
-        
+
         // Add boundaries so we do not need to handle corner cases
         char[] arr = ('L' + S + 'R').toCharArray();
-        
+
         int n = arr.length;
-        int start = 0 , end = 0;
-        
-        while(end < n) {
-            
+        int start = 0, end = 0;
+
+        while (end < n) {
+
             char curr = arr[end];
-            
-            if(curr != '.') {
-                
-                convert(arr,start,end);
+
+            if (curr != '.') {
+
+                convert(arr, start, end);
                 start = end;
                 // for next window of dominoes
             }
@@ -144,48 +166,48 @@ public static class Sep16 {
         // remove boundaries when returning answer
         return String.valueOf(arr).substring(1, n - 1);
     }
-    
+
     public void convert(char[] arr, int l, int r) {
-        
+
         char left = arr[l];
         char right = arr[r];
-        
-        if( left == 'L' && right == 'L' ) {
 
-            while(l != r) {
-                
+        if (left == 'L' && right == 'L') {
+
+            while (l != r) {
+
                 arr[l++] = 'L';
             }
 
-        } else if( left == 'R' && right == 'R' ) {
+        } else if (left == 'R' && right == 'R') {
 
-            while(l != r) {
+            while (l != r) {
                 arr[r--] = 'R';
             }
 
-        } else if( left == 'L' && right == 'R') {
+        } else if (left == 'L' && right == 'R') {
 
             return;
-            // nothing to do as no falling domino will make 
-            // others inside the range to fall as l will fall 
+            // nothing to do as no falling domino will make
+            // others inside the range to fall as l will fall
             // left side and r will right side of range
 
-        } else if( left == 'R' && right == 'L' ) {
+        } else if (left == 'R' && right == 'L') {
 
-            if( r - l % 2 == 0) {
+            if (r - l % 2 == 0) {
                 // even case (ie. all the dominoes will be changed (like RRRLLL))
-                while(l < r) {
+                while (l < r) {
                     arr[l++] = 'R';
                     arr[r--] = 'L';
                 }
 
             } else {
-            // even case (ie. dominoes will be changed except middleOne (like RRR.LLL))
-                
-                while(l < r) {
-                    // in odd we do not have to move center domino ans that too is 
+                // even case (ie. dominoes will be changed except middleOne (like RRR.LLL))
+
+                while (l < r) {
+                    // in odd we do not have to move center domino ans that too is
                     // is handled without <= condition as we do not want to change that
-                    
+
                     arr[l++] = 'R';
                     arr[r--] = 'L';
                 }
@@ -193,5 +215,87 @@ public static class Sep16 {
         }
     }
 
-    
+    // 6. Leetcode 43. Multiply Strings
+    // https://leetcode.com/problems/multiply-strings/
+
+    // Given two non-negative integers num1 and num2 represented as strings,
+    // return the product of num1 and num2, also represented as a string.
+
+    public String multiply(String num1, String num2) {
+
+        if (num1.equals("0") || num2.equals("0"))
+            return "0";
+
+        int n = num1.length() + num2.length();
+
+        char[] ans = new char[n];
+        Arrays.fill(ans, '0');
+
+        for (int j = num2.length() - 1; j >= 0; j--) {
+
+            for (int i = num1.length() - 1; i >= 0; i--) {
+
+                int n1 = num1.charAt(i) - '0';
+                int n2 = num2.charAt(j) - '0';
+
+                int val = n1 * n2;
+
+                int idx1 = i + j; // carry index
+                int idx2 = i + j + 1; // remainder index
+
+                int olderCarry = ans[idx2] - '0';
+                val += olderCarry;
+
+                int oldVal = ans[idx1] - '0'; // old Stored Value At Idx1
+                ans[idx1] = (char) (oldVal + (val / 10) + '0'); // add old value at idx1 too
+                ans[idx2] = (char) ((val % 10) + '0'); // updated value
+            }
+        }
+        int i = 0;
+        while (ans[i] == '0')
+            i++; // for removing extra zeroes
+
+        return String.valueOf(ans).substring(i, n);
+    }
+
+    // 7. 849. Maximize Distance to Closest Person
+    // https://leetcode.com/problems/maximize-distance-to-closest-person/
+    public int maxDistToClosest(int[] seats) {
+
+        // Handle left and rightmost first
+        int n = seats.length;
+        int ans = 0;
+
+        int i = 0;
+        while (seats[i] != 1) {
+            i++;
+        }
+        ans = Math.max(ans, i - 0); // first block of zeroes ie. if he sits at leftmost seat
+
+        int j = n - 1;
+        while (seats[j] != 1) {
+            j--;
+        }
+        ans = Math.max(ans, n - 1 - j); // last block of zeroes ie. if he sits at rightmost seat
+
+        // Now handle middle cases
+
+        j = i + 1; // move the j pointer to i+1 so we can find next block of zeroes from starting
+        while (j < n) {
+
+            if (seats[j] == 1) {
+                // we found a block
+
+                int len = j - i; // length of zeroes including both 1's
+                int mid = len / 2; // mid point where alex can sit
+
+                ans = Math.max(mid, ans); // update the max
+
+                i = j; // move the start pointer to next starting block
+            }
+            j++;
+        }
+        return ans;
+    }
+
 }
